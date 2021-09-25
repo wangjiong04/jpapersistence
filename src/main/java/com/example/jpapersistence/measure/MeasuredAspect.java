@@ -8,6 +8,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.util.StopWatch;
 
 import java.lang.reflect.Method;
 
@@ -18,18 +19,21 @@ import java.lang.reflect.Method;
 public class MeasuredAspect {
     @Around("@annotation(com.example.jpapersistence.measure.Measured)")
     public Object measureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
-        long start = System.currentTimeMillis();
+
+        final StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         Object proceed = joinPoint.proceed();
-        long executionTime = System.currentTimeMillis() - start;
+        stopWatch.stop();
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
         Measured measured = method.getAnnotation(Measured.class);
         String message = measured.message();
 
-        if (StringUtils.isEmpty(message))
-            log.info("Method {} execution: {} ms", joinPoint.getSignature().toShortString(), executionTime);
-        else
-            log.info("{}: {} ms", message, executionTime);
+        if (StringUtils.isEmpty(message)) {
+            log.info("Method {} execution: {} ms", joinPoint.getSignature().toShortString(), stopWatch.getTotalTimeMillis());
+
+        } else
+            log.info("{}: {} ms", message, stopWatch.getTotalTimeMillis());
         return proceed;
     }
 }
