@@ -8,6 +8,10 @@
     <Properties>
         <!-- 配置日志文件输出目录 -->
         <Property name="LOG_HOME">./logs</Property>
+        <!-- 日志默认输出级别 -->
+        <property name="output_log_level">DEBUG</property>
+        <!-- 控制台显示的日志最低级别 -->
+        <property name="console_print_level">DEBUG</property>
     </Properties>
 
     <Appenders>
@@ -17,7 +21,10 @@
             <!-- 控制台只输出level及以上级别的信息(onMatch),其他的直接拒绝(onMismatch) -->
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
             <!-- 输出日志的格式 -->
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <!--PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/-->
+            <PatternLayout
+                    pattern="[%style{%d{HH:mm:ss.SSS}}{bright,green}][%highlight{%p}{ERROR=Bright RED,WARN=Bright Yellow,INFO=Bright Green,DEBUG=Bright Cyan,TRACE=Bright Black}][%style{%M}{bright,magenta}][%highlight{%L}][%style{%C}{bright,blue}]: %msg%n%style{%throwable}{red}"
+                    disableAnsi="false" noConsoleNoAnsi="false"/>
         </Console>
 
         <!-- 设置日志格式并配置日志压缩格式(sinfo.log.日期.gz) -->
