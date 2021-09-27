@@ -1,4 +1,4 @@
-package com.example.jpapersistence.measure;
+package com.example.jpapersistence.common.measure;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

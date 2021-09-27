@@ -10,19 +10,9 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class JpapersistenceApplication {
-    @Autowired
-    private IdCompare idCompare;
 
     public static void main(String[] args) {
         SpringApplication.run(JpapersistenceApplication.class, args);
     }
 
-    @Bean
-    public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
-        return args -> {
-
-            idCompare.test();
-
-        };
-    }
 }

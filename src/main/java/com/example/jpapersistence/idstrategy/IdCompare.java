@@ -1,6 +1,6 @@
 package com.example.jpapersistence.idstrategy;
 
-import com.example.jpapersistence.measure.Measured;
+import com.example.jpapersistence.common.measure.Measured;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;

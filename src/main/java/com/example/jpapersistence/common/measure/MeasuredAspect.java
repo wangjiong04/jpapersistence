@@ -1,4 +1,4 @@
-package com.example.jpapersistence.measure;
+package com.example.jpapersistence.common.measure;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
 @Configuration
 @EnableAspectJAutoProxy
 public class MeasuredAspect {
-    @Around("@annotation(com.example.jpapersistence.measure.Measured)")
+    @Around("@annotation(com.example.jpapersistence.common.measure.Measured)")
     public Object measureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
 
         final StopWatch stopWatch = new StopWatch();
