@@ -19,9 +19,9 @@ public class IdApplication {
     @Bean
     public CommandLineRunner idApplicationInit(ApplicationContext ctx) {
         return args -> {
-
             idCompare.test();
-
+            idCompare.test1();
+            idCompare.test2();
         };
     }
 }
