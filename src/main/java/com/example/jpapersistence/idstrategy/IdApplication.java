@@ -22,6 +22,7 @@ public class IdApplication {
             idCompare.test();
             idCompare.test1();
             idCompare.test2();
+            idCompare.test3();
         };
     }
 }
