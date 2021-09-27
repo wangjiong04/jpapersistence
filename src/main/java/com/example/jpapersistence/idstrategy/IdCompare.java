@@ -10,6 +10,7 @@ import com.example.jpapersistence.common.repository.AuthorRepository;
 import com.example.jpapersistence.common.repository.Author_Algorithm_Repository;
 import com.example.jpapersistence.common.repository.Author_UUID_Repository;
 import com.example.jpapersistence.common.repository.Author_UUID_Update_Repository;
+import org.jeasy.random.EasyRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +32,7 @@ public class IdCompare {
     private SnowFlake snowFlake;
 
     @Measured(message = "Sequence id:")
-    public void test() {
+    public void insertSequence() {
         for (int i = 0; i < 10000; i++) {
             Author author = new Author();
             authorRepository.save(author);
@@ -39,7 +40,7 @@ public class IdCompare {
     }
 
     @Measured(message = "UUID:")
-    public void test1() {
+    public void insertUUID() {
         for (int i = 0; i < 10000; i++) {
             Author_UUID author = new Author_UUID();
             author_uuid_repository.save(author);
@@ -47,7 +48,7 @@ public class IdCompare {
     }
 
     @Measured(message = "UUID to int64:")
-    public void test2() {
+    public void insertUUIDUpdate() {
         for (int i = 0; i < 10000; i++) {
             Author_UUID_Update author = new Author_UUID_Update();
             author_uuid_update_repository.save(author);
@@ -55,12 +56,17 @@ public class IdCompare {
     }
 
     @Measured(message = "Snow flake id:")
-    public void test3() {
+    public void insertSnowFlake() {
         for (int i = 0; i < 10000; i++) {
             Author_Algorithm author = new Author_Algorithm();
             author.setId(snowFlake.nextId());
             author_algorithm_repository.save(author);
         }
+    }
+
+    public void test() {
+        EasyRandom easyRandom = new EasyRandom();
+        Author author = easyRandom.nextObject(Author.class);
     }
 
 }
