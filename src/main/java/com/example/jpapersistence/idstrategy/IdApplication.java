@@ -19,11 +19,11 @@ public class IdApplication {
     @Bean
     public CommandLineRunner idApplicationInit(ApplicationContext ctx) {
         return args -> {
-//            idCompare.insertSequence();
-//            idCompare.insertUUID();
-//            idCompare.insertUUIDUpdate();
-//            idCompare.insertSnowFlake();
-            idCompare.test();
+            //            idCompare.insertSequence();
+            //            idCompare.insertUUID();
+            //            idCompare.insertUUIDUpdate();
+            //            idCompare.insertSnowFlake();
+            idCompare.generateAssociate();
         };
     }
 }

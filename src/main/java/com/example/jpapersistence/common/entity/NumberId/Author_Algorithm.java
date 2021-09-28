@@ -1,4 +1,6 @@
-package com.example.jpapersistence.common.entity;
+package com.example.jpapersistence.common.entity.NumberId;
+
+import com.example.jpapersistence.common.enums.Gender;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -12,7 +14,7 @@ public class Author_Algorithm {
 
     private int age;
     private String name;
-    private String genre;
+    private Gender genre;
 
     public void setId(Long id) {
         this.id = id;

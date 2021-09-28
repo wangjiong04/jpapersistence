@@ -1,4 +1,6 @@
-package com.example.jpapersistence.common.entity;
+package com.example.jpapersistence.common.entity.UUID;
+
+import com.example.jpapersistence.common.enums.Gender;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -9,9 +11,9 @@ import java.util.UUID;
 @Table(name = "author_uuid")
 public class Author_UUID {
     @Id
-    private String id=UUID.randomUUID().toString();
+    private String id = UUID.randomUUID().toString();
 
     private int age;
     private String name;
-    private String genre;
+    private Gender genre;
 }

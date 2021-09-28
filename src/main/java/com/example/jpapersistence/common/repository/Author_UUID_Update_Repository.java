@@ -1,7 +1,6 @@
 package com.example.jpapersistence.common.repository;
 
-import com.example.jpapersistence.common.entity.Author_UUID;
-import com.example.jpapersistence.common.entity.Author_UUID_Update;
+import com.example.jpapersistence.common.entity.NumberId.Author_UUID_Update;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

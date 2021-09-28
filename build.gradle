@@ -30,6 +30,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
     implementation 'org.apache.commons:commons-lang3'
     implementation 'org.jeasy:easy-random-core:5.0.0'
+    implementation 'org.jeasy:easy-random-randomizers:5.0.0'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
