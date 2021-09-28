@@ -22,14 +22,15 @@ import com.example.jpapersistence.common.SnowFlake;
 import com.example.jpapersistence.common.entity.NumberId.*;
 import com.example.jpapersistence.common.entity.UUID.Author_UUID;
 import com.example.jpapersistence.common.measure.Measured;
+import com.example.jpapersistence.common.repository.AuthorRepository;
 import com.example.jpapersistence.common.repository.Author_Algorithm_Repository;
 import com.example.jpapersistence.common.repository.Author_UUID_Repository;
 import com.example.jpapersistence.common.repository.Author_UUID_Update_Repository;
 
 @Component
 public class IdCompare {
-    //    @Autowired
-    //    private AuthorRepository              authorRepository;
+    @Autowired
+    private AuthorRepository              authorRepository;
 
     @Autowired
     private Author_UUID_Repository        author_uuid_repository;
@@ -78,36 +79,31 @@ public class IdCompare {
         }
     }
 
-    public void generateAssociate() {
-        Randomizer<Book> bookRandomizer = new Randomizer<Book>() {
-            Randomizer<Comment>  commentRandomizer = new Randomizer<Comment>() {
-                                                       EasyRandomParameters parameters = new EasyRandomParameters()
-                                                           .randomize(
-                                                               FieldPredicates.named("title"),
-                                                               new WordRandomizer())
-                                                           .randomize(
-                                                               FieldPredicates.named("content"),
-                                                               new SentenceRandomizer())
-                                                           .collectionSizeRange(2, 5)
-                                                           .stringLengthRange(5, 20)
-                                                           .excludeField(named("book")
-                                                               .and(inClass(Comment.class)))
-                                                           .excludeField(named("id")
-                                                               .and(inClass(Comment.class)));
+    private Randomizer<Comment> getCommentRandomizer() {
+        return new Randomizer<Comment>() {
+            EasyRandomParameters parameters = new EasyRandomParameters()
+                .randomize(
+                    FieldPredicates.named("grade").and(FieldPredicates.inClass(Comment.class)),
+                    new IntegerRangeRandomizer(1, 5))
+                .randomize(FieldPredicates.named("title"), new WordRandomizer())
+                .randomize(FieldPredicates.named("content"), new SentenceRandomizer())
+                .excludeField(named("book").and(inClass(Comment.class)))
+                .excludeField(named("id").and(inClass(Comment.class)));
 
-                                                       private EasyRandom   easyRandom = new EasyRandom(
-                                                           parameters);
+            private EasyRandom   easyRandom = new EasyRandom(parameters);
 
-                                                       @Override
-                                                       public Comment getRandomValue() {
-                                                           return easyRandom
-                                                               .nextObject(Comment.class);
-                                                       }
+            @Override
+            public Comment getRandomValue() {
+                return easyRandom.nextObject(Comment.class);
+            }
 
-                                                   };
+        };
 
-            EasyRandomParameters parameters        = new EasyRandomParameters()
-                .collectionSizeRange(2, 5)
+    }
+
+    private Randomizer<Book> getBookRandomizer() {
+        return new Randomizer<Book>() {
+            EasyRandomParameters parameters = new EasyRandomParameters()
                 .randomize(FieldPredicates.named("price").and(FieldPredicates.inClass(Book.class)),
                     new IntegerRangeRandomizer(15, 100))
                 .randomize(FieldPredicates.named("title").and(FieldPredicates.inClass(Book.class)),
@@ -115,11 +111,11 @@ public class IdCompare {
                 .randomize(
                     FieldPredicates.named("comments").and(FieldPredicates.ofType(List.class))
                         .and(FieldPredicates.inClass(Book.class)),
-                    new ListRandomizer<Comment>(commentRandomizer))
-                .stringLengthRange(5, 20).excludeField(named("author").and(inClass(Book.class)))
+                    new ListRandomizer<Comment>(getCommentRandomizer(), 10))
+                .excludeField(named("author").and(inClass(Book.class)))
                 .excludeField(named("id").and(inClass(Comment.class)));
 
-            private EasyRandom   easyRandom        = new EasyRandom(parameters);
+            private EasyRandom   easyRandom = new EasyRandom(parameters);
 
             @Override
             public Book getRandomValue() {
@@ -127,9 +123,10 @@ public class IdCompare {
             }
 
         };
+    }
 
-        EasyRandomParameters parameters = new EasyRandomParameters().collectionSizeRange(2, 5)
-            .stringLengthRange(5, 20)
+    public void generateAssociate() {
+        EasyRandomParameters parameters = new EasyRandomParameters().collectionSizeRange(2, 8)
             .randomize(FieldPredicates.named("name").and(FieldPredicates.inClass(Author.class)),
                 new FullNameRandomizer())
             .randomize(FieldPredicates.named("age").and(FieldPredicates.inClass(Author.class)),
@@ -137,10 +134,17 @@ public class IdCompare {
             .randomize(
                 FieldPredicates.named("books").and(FieldPredicates.ofType(List.class))
                     .and(FieldPredicates.inClass(Author.class)),
-                new ListRandomizer<Book>(bookRandomizer))
+                new ListRandomizer<Book>(getBookRandomizer(), 5))
             .excludeField(named("id").and(inClass(Author.class)));
         EasyRandom easyRandom = new EasyRandom(parameters);
-        List<Author> author = easyRandom.objects(Author.class, 10).collect(Collectors.toList());
+        List<Author> authors = easyRandom.objects(Author.class, 100).collect(Collectors.toList());
+        authors.forEach(author -> {
+            author.getBooks().forEach(book -> {
+                book.setAuthor(author);
+                book.getComments().forEach(comment -> comment.setBook(book));
+            });
+        });
+        authorRepository.saveAll(authors);
     }
 
 }
