@@ -1,6 +1,5 @@
 package com.example.jpapersistence.idstrategy;
 
-import static org.jeasy.random.FieldPredicates.inClass;
 import static org.jeasy.random.FieldPredicates.named;
 
 import java.util.List;
@@ -9,17 +8,16 @@ import java.util.stream.Collectors;
 import org.jeasy.random.EasyRandom;
 import org.jeasy.random.EasyRandomParameters;
 import org.jeasy.random.FieldPredicates;
-import org.jeasy.random.api.Randomizer;
 import org.jeasy.random.randomizers.FullNameRandomizer;
 import org.jeasy.random.randomizers.SentenceRandomizer;
-import org.jeasy.random.randomizers.WordRandomizer;
-import org.jeasy.random.randomizers.collection.ListRandomizer;
 import org.jeasy.random.randomizers.range.IntegerRangeRandomizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.example.jpapersistence.common.SnowFlake;
-import com.example.jpapersistence.common.entity.NumberId.*;
+import com.example.jpapersistence.common.entity.NumberId.Author;
+import com.example.jpapersistence.common.entity.NumberId.Author_Algorithm;
+import com.example.jpapersistence.common.entity.NumberId.Author_UUID_Update;
 import com.example.jpapersistence.common.entity.UUID.Author_UUID;
 import com.example.jpapersistence.common.measure.Measured;
 import com.example.jpapersistence.common.repository.AuthorRepository;
@@ -50,7 +48,7 @@ public class IdCompare {
     public void insertSequence() {
         for (int i = 0; i < max; i++) {
             Author author = new Author();
-            //authorRepository.save(author);
+            authorRepository.save(author);
         }
     }
 
@@ -79,72 +77,42 @@ public class IdCompare {
         }
     }
 
-    private Randomizer<Comment> getCommentRandomizer() {
-        return new Randomizer<Comment>() {
-            EasyRandomParameters parameters = new EasyRandomParameters()
-                .randomize(
-                    FieldPredicates.named("grade").and(FieldPredicates.inClass(Comment.class)),
-                    new IntegerRangeRandomizer(1, 5))
-                .randomize(FieldPredicates.named("title"), new WordRandomizer())
-                .randomize(FieldPredicates.named("content"), new SentenceRandomizer())
-                .excludeField(named("book").and(inClass(Comment.class)))
-                .excludeField(named("id").and(inClass(Comment.class)));
-
-            private EasyRandom   easyRandom = new EasyRandom(parameters);
-
-            @Override
-            public Comment getRandomValue() {
-                return easyRandom.nextObject(Comment.class);
-            }
-
-        };
-
-    }
-
-    private Randomizer<Book> getBookRandomizer() {
-        return new Randomizer<Book>() {
-            EasyRandomParameters parameters = new EasyRandomParameters()
-                .randomize(FieldPredicates.named("price").and(FieldPredicates.inClass(Book.class)),
-                    new IntegerRangeRandomizer(15, 100))
-                .randomize(FieldPredicates.named("title").and(FieldPredicates.inClass(Book.class)),
-                    new WordRandomizer())
-                .randomize(
-                    FieldPredicates.named("comments").and(FieldPredicates.ofType(List.class))
-                        .and(FieldPredicates.inClass(Book.class)),
-                    new ListRandomizer<Comment>(getCommentRandomizer(), 10))
-                .excludeField(named("author").and(inClass(Book.class)))
-                .excludeField(named("id").and(inClass(Comment.class)));
-
-            private EasyRandom   easyRandom = new EasyRandom(parameters);
-
-            @Override
-            public Book getRandomValue() {
-                return easyRandom.nextObject(Book.class);
-            }
-
-        };
-    }
-
     public void generateAssociate() {
-        EasyRandomParameters parameters = new EasyRandomParameters().collectionSizeRange(2, 8)
-            .randomize(FieldPredicates.named("name").and(FieldPredicates.inClass(Author.class)),
-                new FullNameRandomizer())
-            .randomize(FieldPredicates.named("age").and(FieldPredicates.inClass(Author.class)),
-                new IntegerRangeRandomizer(25, 50))
-            .randomize(
-                FieldPredicates.named("books").and(FieldPredicates.ofType(List.class))
-                    .and(FieldPredicates.inClass(Author.class)),
-                new ListRandomizer<Book>(getBookRandomizer(), 5))
-            .excludeField(named("id").and(inClass(Author.class)));
+        EasyRandomParameters parameters = new EasyRandomParameters().collectionSizeRange(4, 8)
+            .stringLengthRange(1, 255).objectPoolSize(10000)
+            .randomize(FieldPredicates.named("name"), new FullNameRandomizer())
+            .randomize(FieldPredicates.named("age"), new IntegerRangeRandomizer(25, 60))
+            .randomize(FieldPredicates.named("price"), new IntegerRangeRandomizer(15, 100))
+            .randomize(FieldPredicates.named("title"), new SentenceRandomizer())
+            .excludeField(named("author"))
+            .randomize(FieldPredicates.named("grade"), new IntegerRangeRandomizer(1, 5))
+            .randomize(FieldPredicates.named("title"), new SentenceRandomizer())
+            .randomize(FieldPredicates.named("content"), new SentenceRandomizer())
+            .excludeField(named("book")).excludeField(named("id"));
         EasyRandom easyRandom = new EasyRandom(parameters);
         List<Author> authors = easyRandom.objects(Author.class, 100).collect(Collectors.toList());
         authors.forEach(author -> {
             author.getBooks().forEach(book -> {
+                book.setId(snowFlake.nextId());
                 book.setAuthor(author);
-                book.getComments().forEach(comment -> comment.setBook(book));
+                book.getComments().forEach(comment -> {
+                    comment.setId(snowFlake.nextId());
+                    comment.setBook(book);
+                });
             });
         });
         authorRepository.saveAll(authors);
+
+        List<Author_UUID> author_uuids = easyRandom.objects(Author_UUID.class, 100)
+            .collect(Collectors.toList());
+        author_uuids.forEach(author -> {
+            author.getBooks().forEach(book -> {
+                book.setAuthor(author);
+                book.getComments().forEach(comment -> comment.setBook(book));
+            });
+
+        });
+        author_uuid_repository.saveAll(author_uuids);
     }
 
 }

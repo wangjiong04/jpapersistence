@@ -1,21 +1,21 @@
 package com.example.jpapersistence.common.entity.NumberId;
 
+import java.util.UUID;
+
 import com.example.jpapersistence.common.BitConverter;
 import com.example.jpapersistence.common.enums.Gender;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.util.UUID;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "author_uuid_update")
 public class Author_UUID_Update {
     @Id
-    private long id = GuidToInt64();
+    private long   id = GuidToInt64();
 
-    private int age;
+    private int    age;
     private String name;
+    @Enumerated(EnumType.STRING)
     private Gender genre;
 
     private static long GuidToInt64() {

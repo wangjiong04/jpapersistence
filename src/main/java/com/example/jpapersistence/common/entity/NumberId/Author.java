@@ -16,6 +16,7 @@ public class Author {
 
     private int        age;
     private String     name;
+    @Enumerated(EnumType.STRING)
     private Gender     genre;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "author", fetch = FetchType.LAZY)

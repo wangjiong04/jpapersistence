@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.example.jpapersistence.common.BitConverter;
+import com.example.jpapersistence.common.enums.Category;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -26,6 +27,9 @@ public class Book {
     @JsonManagedReference("comments")
     private List<Comment> comments;
 
+    @Enumerated(EnumType.STRING)
+    private Category      category;
+
     private static long GuidToInt64() {
         byte[] bytes = UUID.randomUUID().toString().getBytes();
         return BitConverter.toInt64(bytes, 0);
@@ -37,5 +41,9 @@ public class Book {
 
     public void setAuthor(Author author) {
         this.author = author;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

@@ -31,4 +31,8 @@ public class Comment {
     public void setBook(Book book) {
         this.book = book;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
