@@ -25,7 +25,10 @@ import com.example.jpapersistence.common.repository.Author_Algorithm_Repository;
 import com.example.jpapersistence.common.repository.Author_UUID_Repository;
 import com.example.jpapersistence.common.repository.Author_UUID_Update_Repository;
 
+import lombok.extern.log4j.Log4j2;
+
 @Component
+@Log4j2
 public class IdCompare {
     @Autowired
     private AuthorRepository              authorRepository;
@@ -77,6 +80,17 @@ public class IdCompare {
         }
     }
 
+    @Measured(message = "Get by number id:")
+    public void getById() {
+        Author author = authorRepository.findWithGraph(16L, "author_join");
+    }
+
+    @Measured(message = "Get by uuid:")
+    public void getByUuid() {
+        Author_UUID author = author_uuid_repository
+            .findWithGraph("1d11b137-8a38-4974-b3d2-e33ddc8d9b34", "author_uuid_join");
+    }
+
     public void generateAssociate() {
         EasyRandomParameters parameters = new EasyRandomParameters().collectionSizeRange(4, 8)
             .stringLengthRange(1, 255).objectPoolSize(10000)
@@ -90,7 +104,7 @@ public class IdCompare {
             .randomize(FieldPredicates.named("content"), new SentenceRandomizer())
             .excludeField(named("book")).excludeField(named("id"));
         EasyRandom easyRandom = new EasyRandom(parameters);
-        List<Author> authors = easyRandom.objects(Author.class, 100).collect(Collectors.toList());
+        List<Author> authors = easyRandom.objects(Author.class, 1).collect(Collectors.toList());
         authors.forEach(author -> {
             author.getBooks().forEach(book -> {
                 book.setId(snowFlake.nextId());
@@ -103,7 +117,7 @@ public class IdCompare {
         });
         authorRepository.saveAll(authors);
 
-        List<Author_UUID> author_uuids = easyRandom.objects(Author_UUID.class, 100)
+        List<Author_UUID> author_uuids = easyRandom.objects(Author_UUID.class, 1)
             .collect(Collectors.toList());
         author_uuids.forEach(author -> {
             author.getBooks().forEach(book -> {

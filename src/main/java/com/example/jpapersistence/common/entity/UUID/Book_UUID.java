@@ -3,6 +3,8 @@ package com.example.jpapersistence.common.entity.UUID;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Persistable;
+
 import com.example.jpapersistence.common.enums.Category;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -10,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import javax.persistence.*;
 
 @Entity(name = "book_uuid")
-public class Book_UUID {
+public class Book_UUID implements Persistable<String> {
     @Id
     private String             id = UUID.randomUUID().toString();
 
@@ -34,6 +36,16 @@ public class Book_UUID {
 
     public void setAuthor(Author_UUID author) {
         this.author = author;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return true;
     }
 
 }

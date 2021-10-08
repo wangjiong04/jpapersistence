@@ -23,8 +23,9 @@ public class IdApplication {
             //            idCompare.insertUUID();
             //            idCompare.insertUUIDUpdate();
             //            idCompare.insertSnowFlake();
-            for (int i = 0; i < 300; i++)
-                idCompare.generateAssociate();
+            //            idCompare.getById();
+            //            idCompare.getByUuid();
+            idCompare.generateAssociate();
         };
     }
 }

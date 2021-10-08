@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 
+@NamedEntityGraph(name = "author_join", attributeNodes = { @NamedAttributeNode(value = "books", subgraph = "book-comments"), },
+
+        subgraphs = { @NamedSubgraph(name = "book-comments", attributeNodes = { @NamedAttributeNode("comments") }) })
 @Entity
 @SequenceGenerator(name = "author_id_seq", sequenceName = "author_id_seq", allocationSize = 1)
 public class Author {
